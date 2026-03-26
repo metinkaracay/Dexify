@@ -21,3 +21,6 @@ dependencyResolutionManagement {
 
 rootProject.name = "Dexify"
 include(":app")
+include(":core:network")
+include(":core:designsystem")
+include(":feature:pokedex")
