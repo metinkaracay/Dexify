@@ -41,4 +41,8 @@ dependencies {
 
     // Coroutines
     implementation(libs.androidx.core.ktx)
+
+    // Chucker
+    debugImplementation(libs.chucker.library)
+    releaseImplementation(libs.chucker.library.no.op)
 }

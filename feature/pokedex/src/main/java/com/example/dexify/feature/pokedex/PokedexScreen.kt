@@ -1,32 +1,47 @@
 package com.example.dexify.feature.pokedex
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -34,7 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.example.dexify.feature.pokedex.model.Pokemon
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -42,7 +57,26 @@ fun PokedexScreen(
     viewModel: PokemonListViewModel = hiltViewModel()
 ) {
     val pokemonItems = viewModel.pokemonPagingFlow.collectAsLazyPagingItems()
+    val filterState by viewModel.filterState.collectAsState()
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
+
+    var showBottomSheet by rememberSaveable { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
+    val scope = rememberCoroutineScope()
+
+    if (showBottomSheet) {
+        FilterBottomSheet(
+            sheetState = sheetState,
+            currentFilter = filterState,
+            onApply = { newFilter ->
+                viewModel.applyFilters(newFilter)
+                scope.launch { sheetState.hide() }.invokeOnCompletion {
+                    showBottomSheet = false
+                }
+            },
+            onDismiss = { showBottomSheet = false }
+        )
+    }
 
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
@@ -52,79 +86,91 @@ fun PokedexScreen(
         containerColor = MaterialTheme.colorScheme.background
     ) { innerPadding ->
 
-        when (pokemonItems.loadState.refresh) {
-            is LoadState.Loading -> {
-                LoadingScreen(modifier = Modifier.padding(innerPadding))
-            }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            SearchBar(
+                currentQuery = filterState.query,
+                onClick = { showBottomSheet = true },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            )
 
-            is LoadState.Error -> {
-                val error = pokemonItems.loadState.refresh as LoadState.Error
-                ErrorScreen(
-                    message = error.error.localizedMessage ?: "An unknown error occurred",
-                    onRetry = { pokemonItems.retry() },
-                    modifier = Modifier.padding(innerPadding)
-                )
-            }
+            when (pokemonItems.loadState.refresh) {
+                is LoadState.Loading -> {
+                    LoadingScreen()
+                }
 
-            is LoadState.NotLoading -> {
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(2),
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(innerPadding),
-                    contentPadding = PaddingValues(
-                        start = 16.dp,
-                        end = 16.dp,
-                        bottom = 24.dp,
-                        top = 8.dp
-                    ),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(
-                        count = pokemonItems.itemCount,
-                        key = { index -> pokemonItems[index]?.id ?: index }
-                    ) { index ->
-                        val pokemon = pokemonItems[index]
-                        if (pokemon != null) {
-                            PokemonCard(pokemon = pokemon)
-                        }
-                    }
+                is LoadState.Error -> {
+                    val error = pokemonItems.loadState.refresh as LoadState.Error
+                    ErrorScreen(
+                        message = error.error.localizedMessage
+                            ?: "An unknown error occurred",
+                        onRetry = { pokemonItems.retry() }
+                    )
+                }
 
-                    // Append loading indicator
-                    if (pokemonItems.loadState.append is LoadState.Loading) {
-                        item(span = { GridItemSpan(2) }) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(24.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(32.dp),
-                                    color = MaterialTheme.colorScheme.primary,
-                                    strokeWidth = 3.dp
-                                )
+                is LoadState.NotLoading -> {
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(2),
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(
+                            start = 16.dp,
+                            end = 16.dp,
+                            bottom = 24.dp,
+                            top = 8.dp
+                        ),
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        items(
+                            count = pokemonItems.itemCount,
+                            key = { index -> pokemonItems[index]?.id ?: index }
+                        ) { index ->
+                            val pokemon = pokemonItems[index]
+                            if (pokemon != null) {
+                                PokemonCard(pokemon = pokemon)
                             }
                         }
-                    }
 
-                    // Append error with retry
-                    if (pokemonItems.loadState.append is LoadState.Error) {
-                        item(span = { GridItemSpan(2) }) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Button(
-                                    onClick = { pokemonItems.retry() },
-                                    colors = ButtonDefaults.buttonColors(
-                                        containerColor = MaterialTheme.colorScheme.primary
-                                    )
+                        // Append loading indicator
+                        if (pokemonItems.loadState.append is LoadState.Loading) {
+                            item(span = { GridItemSpan(2) }) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(24.dp),
+                                    contentAlignment = Alignment.Center
                                 ) {
-                                    Text("Retry")
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(32.dp),
+                                        color = MaterialTheme.colorScheme.primary,
+                                        strokeWidth = 3.dp
+                                    )
+                                }
+                            }
+                        }
+
+                        // Append error with retry
+                        if (pokemonItems.loadState.append is LoadState.Error) {
+                            item(span = { GridItemSpan(2) }) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Button(
+                                        onClick = { pokemonItems.retry() },
+                                        colors = ButtonDefaults.buttonColors(
+                                            containerColor = MaterialTheme.colorScheme.primary
+                                        )
+                                    ) {
+                                        Text("Retry")
+                                    }
                                 }
                             }
                         }
@@ -132,6 +178,39 @@ fun PokedexScreen(
                 }
             }
         }
+    }
+}
+
+@Composable
+private fun SearchBar(
+    currentQuery: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .clip(RoundedCornerShape(16.dp))
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.6f))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 16.dp, vertical = 14.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = Icons.Outlined.Search,
+            contentDescription = "Search",
+            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.size(22.dp)
+        )
+        Spacer(modifier = Modifier.width(12.dp))
+        Text(
+            text = if (currentQuery.isBlank()) "Search Pokémon..." else currentQuery,
+            style = MaterialTheme.typography.bodyLarge,
+            color = if (currentQuery.isBlank())
+                MaterialTheme.colorScheme.onSurfaceVariant
+            else
+                MaterialTheme.colorScheme.onSurface,
+            maxLines = 1
+        )
     }
 }
 

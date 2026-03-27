@@ -6,7 +6,8 @@ import com.example.dexify.core.network.PokeApiService
 import com.example.dexify.feature.pokedex.model.Pokemon
 
 class PokemonPagingSource(
-    private val apiService: PokeApiService
+    private val apiService: PokeApiService,
+    private val query: String = ""
 ) : PagingSource<Int, Pokemon>() {
 
     companion object {
@@ -39,6 +40,12 @@ class PokemonPagingSource(
                     name = entry.name,
                     imageUrl = "${ARTWORK_BASE_URL}${id}.png"
                 )
+            }.let { list ->
+                if (query.isNotBlank()) {
+                    list.filter { it.name.contains(query, ignoreCase = true) }
+                } else {
+                    list
+                }
             }
 
             LoadResult.Page(
