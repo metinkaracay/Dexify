@@ -1,4 +1,4 @@
-package com.example.dexify.feature.pokedex
+package com.example.dexify.feature.pokedex.pokelist
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

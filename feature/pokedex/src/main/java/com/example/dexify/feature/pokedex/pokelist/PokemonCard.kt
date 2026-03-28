@@ -1,4 +1,4 @@
-package com.example.dexify.feature.pokedex
+package com.example.dexify.feature.pokedex.pokelist
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -59,7 +59,6 @@ fun PokemonCard(
         Box(
             modifier = Modifier.fillMaxSize()
         ) {
-            // Subtle gradient background
             Box(
                 modifier = Modifier
                     .fillMaxSize()
@@ -73,7 +72,6 @@ fun PokemonCard(
                     )
             )
 
-            // Decorative pokéball circle in background
             Box(
                 modifier = Modifier
                     .size(100.dp)
@@ -104,7 +102,6 @@ fun PokemonCard(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceBetween
             ) {
-                // ID badge
                 Text(
                     text = "#${pokemon.id.toString().padStart(3, '0')}",
                     style = MaterialTheme.typography.labelMedium,
@@ -113,7 +110,6 @@ fun PokemonCard(
                     modifier = Modifier.align(Alignment.Start)
                 )
 
-                // Pokémon image
                 SubcomposeAsyncImage(
                     model = pokemon.imageUrl,
                     contentDescription = pokemon.name,
@@ -144,7 +140,6 @@ fun PokemonCard(
                     }
                 )
 
-                // Pokémon name
                 Text(
                     text = pokemon.name.replaceFirstChar {
                         if (it.isLowerCase()) it.titlecase(Locale.ROOT) else it.toString()
