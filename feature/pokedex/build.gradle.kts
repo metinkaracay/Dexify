@@ -31,6 +31,7 @@ android {
 dependencies {
     // Project modules
     implementation(project(":core:network"))
+    implementation(project(":core:database"))
     implementation(project(":core:designsystem"))
 
     // Compose
@@ -50,8 +51,15 @@ dependencies {
     implementation(libs.androidx.paging.runtime)
     implementation(libs.androidx.paging.compose)
 
+    // Room
+    implementation(libs.room.ktx)
+    implementation(libs.room.paging)
+
     // Coil
     implementation(libs.coil.compose)
+
+    // Lottie
+    implementation(libs.lottie.compose)
 
     // Lifecycle
     implementation(libs.androidx.lifecycle.runtime.ktx)

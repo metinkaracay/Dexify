@@ -44,6 +44,7 @@ android {
 dependencies {
     // Project modules
     implementation(project(":core:network"))
+    implementation(project(":core:database"))
     implementation(project(":core:designsystem"))
     implementation(project(":feature:pokedex"))
 

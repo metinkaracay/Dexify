@@ -13,6 +13,6 @@ interface PokeApiService {
     ): PokemonListResponse
 
     companion object {
-        const val BASE_URL = "https://pokeapi.co/api/v2/"
+        const val BASE_URL = Constants.POKE_API_BASE_URL
     }
 }

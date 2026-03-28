@@ -1,4 +1,4 @@
-package com.example.dexify.feature.pokedex
+package com.example.dexify.feature.pokedex.pokelist
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.itemKey
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -128,7 +129,7 @@ fun PokedexScreen(
                     ) {
                         items(
                             count = pokemonItems.itemCount,
-                            key = { index -> pokemonItems[index]?.id ?: index }
+                            key = pokemonItems.itemKey { it.id }
                         ) { index ->
                             val pokemon = pokemonItems[index]
                             if (pokemon != null) {

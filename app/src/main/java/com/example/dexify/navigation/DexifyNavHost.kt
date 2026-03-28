@@ -4,7 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.dexify.feature.pokedex.PokedexScreen
+import com.example.dexify.feature.pokedex.pokelist.PokedexScreen
+import com.example.dexify.feature.pokedex.splash.SplashScreen
 
 @Composable
 fun DexifyNavHost() {
@@ -12,8 +13,17 @@ fun DexifyNavHost() {
 
     NavHost(
         navController = navController,
-        startDestination = "pokedex"
+        startDestination = "splash"
     ) {
+        composable("splash") {
+            SplashScreen(
+                onNavigateToPokedex = {
+                    navController.navigate("pokedex") {
+                        popUpTo("splash") { inclusive = true }
+                    }
+                }
+            )
+        }
         composable("pokedex") {
             PokedexScreen()
         }
