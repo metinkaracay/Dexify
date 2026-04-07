@@ -24,7 +24,8 @@ object DatabaseModule {
             context,
             PokemonDatabase::class.java,
             "dexify_database"
-        ).build()
+        ).fallbackToDestructiveMigration()
+         .build()
     }
 
     @Provides

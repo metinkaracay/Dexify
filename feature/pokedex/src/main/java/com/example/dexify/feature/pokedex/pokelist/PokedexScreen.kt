@@ -55,6 +55,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PokedexScreen(
+    onPokemonClick: (Int) -> Unit = {},
     viewModel: PokemonListViewModel = hiltViewModel()
 ) {
     val pokemonItems = viewModel.pokemonPagingFlow.collectAsLazyPagingItems()
@@ -133,7 +134,10 @@ fun PokedexScreen(
                         ) { index ->
                             val pokemon = pokemonItems[index]
                             if (pokemon != null) {
-                                PokemonCard(pokemon = pokemon)
+                                PokemonCard(
+                                    pokemon = pokemon,
+                                    onClick = { onPokemonClick(pokemon.id) }
+                                )
                             }
                         }
 
