@@ -49,3 +49,15 @@ val TypeDragon = Color(0xFF6F35FC)
 val TypeDark = Color(0xFF705746)
 val TypeSteel = Color(0xFFB7B7CE)
 val TypeFairy = Color(0xFFD685AD)
+
+// Stat bar colors
+val StatHp = Color(0xFFFF5252)
+val StatAttack = Color(0xFFFF7043)
+val StatDefense = Color(0xFFFFCA28)
+val StatSpAtk = Color(0xFF42A5F5)
+val StatSpDef = Color(0xFF66BB6A)
+val StatSpeed = Color(0xFFAB47BC)
+
+// Detail screen icon tints
+val HeightIconTint = Color(0xFF42A5F5)
+val WeightIconTint = Color(0xFFEF5350)

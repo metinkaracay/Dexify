@@ -26,8 +26,8 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.FitnessCenter
-import androidx.compose.material.icons.filled.Height
+import androidx.compose.material.icons.outlined.Scale
+import androidx.compose.material.icons.outlined.Straighten
 import androidx.compose.material.icons.outlined.AutoStories
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -42,14 +42,17 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -59,6 +62,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.SubcomposeAsyncImage
 import com.example.dexify.core.database.entity.PokemonEntity
+import com.example.dexify.core.designsystem.theme.*
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -217,15 +221,24 @@ private fun TypeChip(type: String) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(20.dp))
-            .background(Color.White.copy(alpha = 0.25f))
-            .padding(horizontal = 16.dp, vertical = 6.dp)
+            .background(typeColor.copy(alpha = 0.35f))
+            .background(Color.White.copy(alpha = 0.12f))
+            .then(
+                Modifier
+                    .padding(1.dp)
+                    .clip(RoundedCornerShape(19.dp))
+                    .background(typeColor.copy(alpha = 0.35f))
+                    .background(Color.White.copy(alpha = 0.10f))
+            )
+            .padding(horizontal = 18.dp, vertical = 7.dp),
+        contentAlignment = Alignment.Center
     ) {
         Text(
             text = type.uppercase(Locale.ROOT),
             style = MaterialTheme.typography.labelMedium,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.ExtraBold,
             color = Color.White,
-            letterSpacing = 1.sp
+            letterSpacing = 1.2.sp
         )
     }
 }
@@ -238,13 +251,15 @@ private fun HeightWeightRow(height: Int?, weight: Int?) {
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         InfoCard(
-            icon = Icons.Default.Height,
+            icon = Icons.Outlined.Straighten,
+            iconTint = HeightIconTint,
             title = "HEIGHT",
             value = if (height != null) "${height / 10.0}m" else "—",
             modifier = Modifier.weight(1f)
         )
         InfoCard(
-            icon = Icons.Default.FitnessCenter,
+            icon = Icons.Outlined.Scale,
+            iconTint = WeightIconTint,
             title = "WEIGHT",
             value = if (weight != null) "${weight / 10.0}kg" else "—",
             modifier = Modifier.weight(1f)
@@ -255,35 +270,46 @@ private fun HeightWeightRow(height: Int?, weight: Int?) {
 @Composable
 private fun InfoCard(
     icon: ImageVector,
+    iconTint: Color,
     title: String,
     value: String,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            containerColor = iconTint.copy(alpha = 0.06f).compositeOver(MaterialTheme.colorScheme.surface)
         )
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(vertical = 20.dp, horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = title,
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(28.dp)
-            )
-            Spacer(modifier = Modifier.height(8.dp))
+            Box(
+                modifier = Modifier
+                    .size(44.dp)
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(iconTint.copy(alpha = 0.12f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = title,
+                    tint = iconTint,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            Spacer(modifier = Modifier.height(10.dp))
             Text(
                 text = title,
                 style = MaterialTheme.typography.labelSmall,
+                fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                letterSpacing = 1.sp
+                letterSpacing = 1.2.sp
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
@@ -301,9 +327,10 @@ private fun InfoCard(
 private fun FieldNotesCard(flavorText: String?) {
     Card(
         modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+            containerColor = MaterialTheme.colorScheme.surface
         )
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
@@ -336,31 +363,63 @@ private fun FieldNotesCard(flavorText: String?) {
 // ─── Base Stats ──────────────────────────────────────────────
 @Composable
 private fun BaseStatsSection(pokemon: PokemonEntity) {
-    Text(
-        text = "Base Stats",
-        style = MaterialTheme.typography.titleMedium,
-        fontWeight = FontWeight.Bold,
-        color = MaterialTheme.colorScheme.onBackground
-    )
-    Spacer(modifier = Modifier.height(12.dp))
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp)
+        ) {
+            Text(
+                text = "Base Stats",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Spacer(modifier = Modifier.height(16.dp))
 
-    val stats = listOf(
-        Triple("HP", pokemon.statHp ?: 0, Color(0xFFFF5252)),
-        Triple("ATK", pokemon.statAttack ?: 0, Color(0xFFFF7043)),
-        Triple("DEF", pokemon.statDefense ?: 0, Color(0xFFFFCA28)),
-        Triple("SpA", pokemon.statSpAtk ?: 0, Color(0xFF42A5F5)),
-        Triple("SpD", pokemon.statSpDef ?: 0, Color(0xFF66BB6A)),
-        Triple("SPD", pokemon.statSpeed ?: 0, Color(0xFFAB47BC))
-    )
+            val stats = listOf(
+                Triple("HP", pokemon.statHp ?: 0, StatHp),
+                Triple("ATK", pokemon.statAttack ?: 0, StatAttack),
+                Triple("DEF", pokemon.statDefense ?: 0, StatDefense),
+                Triple("SpA", pokemon.statSpAtk ?: 0, StatSpAtk),
+                Triple("SpD", pokemon.statSpDef ?: 0, StatSpDef),
+                Triple("SPD", pokemon.statSpeed ?: 0, StatSpeed)
+            )
 
-    stats.forEach { (name, value, color) ->
-        StatBar(name = name, value = value, color = color)
-        Spacer(modifier = Modifier.height(10.dp))
+            stats.forEachIndexed { index, (name, value, color) ->
+                StatBar(name = name, value = value, color = color, delayMs = index * 80)
+                if (index < stats.lastIndex) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                }
+            }
+        }
     }
 }
 
 @Composable
-private fun StatBar(name: String, value: Int, color: Color) {
+private fun StatBar(name: String, value: Int, color: Color, delayMs: Int = 0) {
+    val targetProgress = (value / 255f).coerceIn(0f, 1f)
+    val animatable = remember { androidx.compose.animation.core.Animatable(0f) }
+
+    LaunchedEffect(value) {
+        animatable.snapTo(0f)
+        kotlinx.coroutines.delay(delayMs.toLong())
+        animatable.animateTo(
+            targetValue = targetProgress,
+            animationSpec = tween(
+                durationMillis = 800,
+                easing = androidx.compose.animation.core.FastOutSlowInEasing
+            )
+        )
+    }
+
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -385,7 +444,7 @@ private fun StatBar(name: String, value: Int, color: Color) {
         Spacer(modifier = Modifier.width(12.dp))
 
         LinearProgressIndicator(
-            progress = { (value / 255f).coerceIn(0f, 1f) },
+            progress = { animatable.value },
             modifier = Modifier
                 .weight(1f)
                 .height(10.dp)
@@ -415,9 +474,10 @@ private fun AbilitiesSection(abilities: List<String>?) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp),
-            shape = RoundedCornerShape(14.dp),
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.15f).compositeOver(MaterialTheme.colorScheme.surface)
             )
         ) {
             Text(
