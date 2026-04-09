@@ -1,5 +1,8 @@
 package com.example.dexify.feature.pokedex.detail
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -10,7 +13,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -60,15 +62,17 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.SubcomposeAsyncImage
+import coil.compose.AsyncImage
 import com.example.dexify.core.database.entity.PokemonEntity
 import com.example.dexify.core.designsystem.theme.*
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun PokemonDetailScreen(
     onBackClick: () -> Unit,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
     viewModel: PokemonDetailViewModel = hiltViewModel()
 ) {
     val pokemon by viewModel.pokemon.collectAsState()
@@ -125,7 +129,11 @@ fun PokemonDetailScreen(
                     .verticalScroll(rememberScrollState())
                     .padding(horizontal = 16.dp)
             ) {
-                HeroCard(pokemon = p)
+                HeroCard(
+                    pokemon = p,
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedVisibilityScope = animatedVisibilityScope
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -147,9 +155,13 @@ fun PokemonDetailScreen(
 }
 
 // ─── Hero Card ─────────────────────────────────────────────
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-private fun HeroCard(pokemon: PokemonEntity) {
+private fun HeroCard(
+    pokemon: PokemonEntity,
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null
+) {
     val gradientColors = TypeUtils.getTypeGradient(pokemon.types)
 
     Card(
@@ -165,19 +177,22 @@ private fun HeroCard(pokemon: PokemonEntity) {
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                SubcomposeAsyncImage(
+                AsyncImage(
                     model = pokemon.imageUrl,
                     contentDescription = pokemon.name,
-                    modifier = Modifier.size(200.dp),
-                    contentScale = ContentScale.Fit,
-                    loading = {
-                        Box(
-                            modifier = Modifier.size(200.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator(color = Color.White)
-                        }
-                    }
+                    modifier = Modifier
+                        .size(200.dp)
+                        .then(
+                            if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+                                with(sharedTransitionScope) {
+                                    Modifier.sharedElement(
+                                        sharedContentState = rememberSharedContentState(key = "pokemon_image_${pokemon.id}"),
+                                        animatedVisibilityScope = animatedVisibilityScope
+                                    )
+                                }
+                            } else Modifier
+                        ),
+                    contentScale = ContentScale.Fit
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -200,7 +215,15 @@ private fun HeroCard(pokemon: PokemonEntity) {
                     },
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = Color.White,
+                    modifier = if (sharedTransitionScope != null && animatedVisibilityScope != null) {
+                        with(sharedTransitionScope) {
+                            Modifier.sharedBounds(
+                                sharedContentState = rememberSharedContentState(key = "pokemon_name_${pokemon.id}"),
+                                animatedVisibilityScope = animatedVisibilityScope
+                            )
+                        }
+                    } else Modifier
                 )
 
                 if (!pokemon.genus.isNullOrBlank()) {
@@ -394,7 +417,7 @@ private fun BaseStatsSection(pokemon: PokemonEntity) {
             )
 
             stats.forEachIndexed { index, (name, value, color) ->
-                StatBar(name = name, value = value, color = color, delayMs = index * 80)
+                StatBar(name = name, value = value, color = color, delayMs = 300 + index * 80)
                 if (index < stats.lastIndex) {
                     Spacer(modifier = Modifier.height(12.dp))
                 }
