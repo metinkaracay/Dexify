@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import com.example.dexify.core.database.entity.PokemonEntity
@@ -33,11 +34,9 @@ class PokemonDetailViewModel @Inject constructor(
 
     private fun loadDetailIfNeeded() {
         viewModelScope.launch {
-            pokemonDao.getPokemonByIdFlow(pokemonId).collect { entity ->
-                if (entity != null && entity.types == null) {
-                    fetchAndUpdateDetail(entity)
-                }
-                return@collect
+            val entity = pokemonDao.getPokemonByIdFlow(pokemonId).firstOrNull()
+            if (entity != null && entity.types == null) {
+                fetchAndUpdateDetail(entity)
             }
         }
     }

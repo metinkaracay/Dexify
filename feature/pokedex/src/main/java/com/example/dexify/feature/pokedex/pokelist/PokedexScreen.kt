@@ -50,12 +50,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import androidx.paging.compose.itemKey
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun PokedexScreen(
     onPokemonClick: (Int) -> Unit = {},
+    sharedTransitionScope: SharedTransitionScope? = null,
+    animatedVisibilityScope: AnimatedVisibilityScope? = null,
     viewModel: PokemonListViewModel = hiltViewModel()
 ) {
     val pokemonItems = viewModel.pokemonPagingFlow.collectAsLazyPagingItems()
@@ -136,7 +141,9 @@ fun PokedexScreen(
                             if (pokemon != null) {
                                 PokemonCard(
                                     pokemon = pokemon,
-                                    onClick = { onPokemonClick(pokemon.id) }
+                                    onClick = { onPokemonClick(pokemon.id) },
+                                    sharedTransitionScope = sharedTransitionScope,
+                                    animatedVisibilityScope = animatedVisibilityScope
                                 )
                             }
                         }
