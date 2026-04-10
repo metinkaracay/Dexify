@@ -27,6 +27,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.outlined.Scale
 import androidx.compose.material.icons.outlined.Straighten
@@ -97,10 +98,12 @@ fun PokemonDetailScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* Favorite */ }) {
+                    val isFav = pokemon?.isFavorite == true
+                    IconButton(onClick = { viewModel.toggleFavorite() }) {
                         Icon(
-                            imageVector = Icons.Default.FavoriteBorder,
-                            contentDescription = "Favorite"
+                            imageVector = if (isFav) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                            contentDescription = "Favorite",
+                            tint = if (isFav) FavoritePink else MaterialTheme.colorScheme.onSurface
                         )
                     }
                 },

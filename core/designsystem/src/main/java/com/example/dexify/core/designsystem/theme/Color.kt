@@ -61,3 +61,6 @@ val StatSpeed = Color(0xFFAB47BC)
 // Detail screen icon tints
 val HeightIconTint = Color(0xFF42A5F5)
 val WeightIconTint = Color(0xFFEF5350)
+
+// Favorites
+val FavoritePink = Color(0xFFE91E63)

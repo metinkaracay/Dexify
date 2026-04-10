@@ -19,5 +19,6 @@ data class PokemonEntity(
     val statDefense: Int? = null,
     val statSpAtk: Int? = null,
     val statSpDef: Int? = null,
-    val statSpeed: Int? = null
+    val statSpeed: Int? = null,
+    val isFavorite: Boolean = false
 )

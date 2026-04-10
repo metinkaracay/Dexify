@@ -1,5 +1,6 @@
 package com.example.dexify.core.database.dao
 
+import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -34,4 +35,13 @@ interface PokemonDao {
 
     @Query("SELECT * FROM pokemon WHERE id = :id")
     fun getPokemonByIdFlow(id: Int): Flow<PokemonEntity?>
+
+    @Query("UPDATE pokemon SET isFavorite = :isFavorite WHERE id = :id")
+    suspend fun updateFavoriteStatus(id: Int, isFavorite: Boolean)
+
+    @Query("SELECT * FROM pokemon WHERE isFavorite = 1 ORDER BY id ASC")
+    fun getFavoritePokemonPagingSource(): PagingSource<Int, PokemonEntity>
+
+    @Query("SELECT * FROM pokemon WHERE isFavorite = 1 AND name LIKE '%' || :query || '%' ORDER BY id ASC")
+    fun searchFavoritesByNamePagingSource(query: String): PagingSource<Int, PokemonEntity>
 }

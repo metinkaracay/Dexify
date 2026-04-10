@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="no_favorites_yet_title">Henüz Favori Yok</string>
+    <string name="no_favorites_yet_message">Görünüşe göre hiç favori Pokémon\'unuz yok! Bir Pokémon seçin ve favorilerinize ekleyin.</string>
+</resources>

@@ -4,5 +4,6 @@ data class PokedexFilterState(
     val query: String = "",
     val generationId: Int? = null,
     val typeId: String? = null,
-    val habitatId: String? = null
+    val habitatId: String? = null,
+    val showFavoritesOnly: Boolean = false
 )

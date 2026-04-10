@@ -53,6 +53,8 @@ import androidx.paging.compose.itemKey
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import com.example.dexify.core.designsystem.component.EmptyState
+import com.example.dexify.core.designsystem.R as DesignSystemR
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
@@ -121,18 +123,29 @@ fun PokedexScreen(
                 }
 
                 is LoadState.NotLoading -> {
-                    LazyVerticalGrid(
-                        columns = GridCells.Fixed(2),
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(
-                            start = 16.dp,
-                            end = 16.dp,
-                            bottom = 24.dp,
-                            top = 8.dp
-                        ),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
+                    val isEmpty = pokemonItems.loadState.refresh is LoadState.NotLoading
+                            && pokemonItems.loadState.append.endOfPaginationReached
+                            && pokemonItems.itemCount == 0
+
+                    if (isEmpty && filterState.showFavoritesOnly) {
+                        EmptyState(
+                            imageRes = DesignSystemR.drawable.not_favorites_yet,
+                            titleRes = DesignSystemR.string.no_favorites_yet_title,
+                            messageRes = DesignSystemR.string.no_favorites_yet_message
+                        )
+                    } else {
+                        LazyVerticalGrid(
+                            columns = GridCells.Fixed(2),
+                            modifier = Modifier.fillMaxSize(),
+                            contentPadding = PaddingValues(
+                                start = 16.dp,
+                                end = 16.dp,
+                                bottom = 24.dp,
+                                top = 8.dp
+                            ),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
                         items(
                             count = pokemonItems.itemCount,
                             key = pokemonItems.itemKey { it.id }
@@ -185,6 +198,7 @@ fun PokedexScreen(
                                     }
                                 }
                             }
+                        }
                         }
                     }
                 }
