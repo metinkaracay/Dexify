@@ -17,6 +17,8 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Mic
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.Button
@@ -49,6 +51,7 @@ import com.example.dexify.core.designsystem.theme.TypeGrass
 import com.example.dexify.core.designsystem.theme.TypePsychic
 import com.example.dexify.core.designsystem.theme.TypeRock
 import com.example.dexify.core.designsystem.theme.TypeWater
+import com.example.dexify.core.designsystem.theme.FavoritePink
 import com.example.dexify.feature.pokedex.model.PokedexFilterState
 
 private data class GenerationOption(val id: Int, val label: String)
@@ -93,12 +96,14 @@ fun FilterBottomSheet(
     }
     var selectedType by rememberSaveable { mutableStateOf(currentFilter.typeId ?: "") }
     var selectedHabitat by rememberSaveable { mutableStateOf(currentFilter.habitatId ?: "") }
+    var showFavoritesOnly by rememberSaveable { mutableStateOf(currentFilter.showFavoritesOnly) }
 
     fun resetLocal() {
         searchQuery = ""
         selectedGen = null
         selectedType = ""
         selectedHabitat = ""
+        showFavoritesOnly = false
     }
 
     ModalBottomSheet(
@@ -137,6 +142,43 @@ fun FilterBottomSheet(
             }
 
             Spacer(modifier = Modifier.height(20.dp))
+
+            SectionLabel("FAVORITES")
+            Spacer(modifier = Modifier.height(8.dp))
+            FilterChip(
+                selected = showFavoritesOnly,
+                onClick = { showFavoritesOnly = !showFavoritesOnly },
+                leadingIcon = {
+                    Icon(
+                        imageVector = if (showFavoritesOnly) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        tint = if (showFavoritesOnly) Color.White else FavoritePink
+                    )
+                },
+                label = {
+                    Text(
+                        text = "Show Only Favorites",
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = if (showFavoritesOnly) FontWeight.Bold else FontWeight.Medium
+                    )
+                },
+                shape = RoundedCornerShape(20.dp),
+                colors = FilterChipDefaults.filterChipColors(
+                    containerColor = FavoritePink.copy(alpha = 0.12f),
+                    labelColor = FavoritePink,
+                    selectedContainerColor = FavoritePink,
+                    selectedLabelColor = Color.White
+                ),
+                border = FilterChipDefaults.filterChipBorder(
+                    borderColor = FavoritePink.copy(alpha = 0.3f),
+                    selectedBorderColor = FavoritePink,
+                    enabled = true,
+                    selected = showFavoritesOnly
+                )
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
 
             SectionLabel("SEARCH BY NAME")
             Spacer(modifier = Modifier.height(8.dp))
@@ -210,7 +252,8 @@ fun FilterBottomSheet(
                             query = searchQuery.trim(),
                             generationId = selectedGen,
                             typeId = selectedType.ifBlank { null },
-                            habitatId = selectedHabitat.ifBlank { null }
+                            habitatId = selectedHabitat.ifBlank { null },
+                            showFavoritesOnly = showFavoritesOnly
                         )
                     )
                 },

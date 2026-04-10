@@ -41,6 +41,13 @@ class PokemonDetailViewModel @Inject constructor(
         }
     }
 
+    fun toggleFavorite() {
+        viewModelScope.launch {
+            val current = pokemon.value ?: return@launch
+            pokemonDao.updateFavoriteStatus(pokemonId, !current.isFavorite)
+        }
+    }
+
     private suspend fun fetchAndUpdateDetail(entity: PokemonEntity) {
         try {
             val detailDeferred = viewModelScope.async {
