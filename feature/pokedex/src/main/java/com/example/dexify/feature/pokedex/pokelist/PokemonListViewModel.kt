@@ -34,28 +34,37 @@ class PokemonListViewModel @Inject constructor(
 
     val pokemonPagingFlow: Flow<PagingData<Pokemon>> = _filterState
         .flatMapLatest { filters ->
-                Pager(
-                    config = PagingConfig(
-                        pageSize = 20,
-                        initialLoadSize = 20,
-                        prefetchDistance = 10,
-                        enablePlaceholders = false
-                    ),
-                    pagingSourceFactory = { 
+            Pager(
+                config = PagingConfig(
+                    pageSize = 20,
+                    initialLoadSize = 20,
+                    prefetchDistance = 10,
+                    enablePlaceholders = false
+                ),
+                pagingSourceFactory = {
+                    if (filters.showFavoritesOnly) {
+                        if (filters.query.isNotBlank()) {
+                            pokemonDao.searchFavoritesByNamePagingSource(filters.query)
+                        } else {
+                            pokemonDao.getFavoritePokemonPagingSource()
+                        }
+                    } else {
                         PokemonPagingSource(
                             apiService = apiService,
                             pokemonDao = pokemonDao,
                             query = filters.query
                         )
                     }
-                ).flow
+                }
+            ).flow
         }
         .map { pagingData ->
             pagingData.map { entity ->
                 Pokemon(
                     id = entity.id,
                     name = entity.name,
-                    imageUrl = entity.imageUrl
+                    imageUrl = entity.imageUrl,
+                    isFavorite = entity.isFavorite
                 )
             }
         }
