@@ -64,3 +64,8 @@ val WeightIconTint = Color(0xFFEF5350)
 
 // Favorites
 val FavoritePink = Color(0xFFE91E63)
+
+// Inventory badges
+val BadgeItemBlue = Color(0xFF3D5AFE)
+val BadgeBerryOrange = Color(0xFFFF6D00)
+val BadgeMedicineGreen = Color(0xFF00C853)

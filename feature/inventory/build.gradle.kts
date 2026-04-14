@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.android.application)
+    alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt.android)
@@ -7,28 +7,15 @@ plugins {
 }
 
 android {
-    namespace = "com.example.dexify"
+    namespace = "com.example.dexify.feature.inventory"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "com.example.dexify"
         minSdk = 24
-        targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles("consumer-rules.pro")
     }
 
-    buildTypes {
-        release {
-            isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-        }
-    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
@@ -44,15 +31,7 @@ android {
 dependencies {
     // Project modules
     implementation(project(":core:network"))
-    implementation(project(":core:database"))
     implementation(project(":core:designsystem"))
-    implementation(project(":feature:pokedex"))
-    implementation(project(":feature:inventory"))
-
-    // Core Android
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.activity.compose)
 
     // Compose
     implementation(platform(libs.androidx.compose.bom))
@@ -67,18 +46,16 @@ dependencies {
     ksp(libs.hilt.android.compiler)
     implementation(libs.hilt.navigation.compose)
 
-    // Navigation
-    implementation(libs.androidx.navigation.compose)
+    // Coil
+    implementation(libs.coil.compose)
 
-    // Paging (needed for PagingData types in navigation)
+    // Paging
+    implementation(libs.androidx.paging.runtime)
     implementation(libs.androidx.paging.compose)
 
-    // Testing
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
+    // Lifecycle
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+
     debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
 }
