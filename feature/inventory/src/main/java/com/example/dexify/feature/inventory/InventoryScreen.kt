@@ -63,7 +63,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.compose.AsyncImage
-import com.example.dexify.core.designsystem.theme.BadgeBerryOrange
+import com.example.dexify.core.designsystem.theme.BadgeBerryPurple
 import com.example.dexify.core.designsystem.theme.BadgeItemBlue
 import com.example.dexify.core.designsystem.theme.BadgeMedicineGreen
 import com.example.dexify.feature.inventory.model.InventoryCategory
@@ -163,6 +163,11 @@ fun InventoryScreen(
                 ) {
                     items(InventoryCategory.entries) { category ->
                         val isSelected = selectedCategory == category
+                        val categoryColor = when (category) {
+                            InventoryCategory.ITEMS -> BadgeItemBlue
+                            InventoryCategory.BERRIES -> BadgeBerryPurple
+                            InventoryCategory.MEDICINE -> BadgeMedicineGreen
+                        }
                         FilterChip(
                             selected = isSelected,
                             onClick = { viewModel.selectCategory(category) },
@@ -176,8 +181,8 @@ fun InventoryScreen(
                             colors = FilterChipDefaults.filterChipColors(
                                 containerColor = MaterialTheme.colorScheme.surfaceVariant,
                                 labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                                selectedContainerColor = MaterialTheme.colorScheme.onBackground,
-                                selectedLabelColor = MaterialTheme.colorScheme.background
+                                selectedContainerColor = categoryColor,
+                                selectedLabelColor = Color.White
                             ),
                             border = FilterChipDefaults.filterChipBorder(
                                 borderColor = Color.Transparent,
@@ -238,7 +243,7 @@ fun InventoryScreen(
                             contentPadding = PaddingValues(
                                 start = 20.dp,
                                 end = 20.dp,
-                                bottom = 24.dp,
+                                bottom = 88.dp,
                                 top = 4.dp
                             ),
                             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -584,7 +589,7 @@ private fun DetailStatCard(
 private fun CategoryBadge(category: InventoryCategory) {
     val color = when (category) {
         InventoryCategory.ITEMS -> BadgeItemBlue
-        InventoryCategory.BERRIES -> BadgeBerryOrange
+        InventoryCategory.BERRIES -> BadgeBerryPurple
         InventoryCategory.MEDICINE -> BadgeMedicineGreen
     }
     Box(

@@ -67,5 +67,5 @@ val FavoritePink = Color(0xFFE91E63)
 
 // Inventory badges
 val BadgeItemBlue = Color(0xFF3D5AFE)
-val BadgeBerryOrange = Color(0xFFFF6D00)
+val BadgeBerryPurple = Color(0xFF6A1B9A)
 val BadgeMedicineGreen = Color(0xFF00C853)
