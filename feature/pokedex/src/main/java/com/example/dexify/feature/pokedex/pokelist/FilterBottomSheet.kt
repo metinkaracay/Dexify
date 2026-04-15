@@ -132,11 +132,29 @@ fun FilterBottomSheet(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                TextButton(onClick = { resetLocal() }) {
+                val hasActiveFilter = searchQuery.isNotBlank() ||
+                        selectedGen != null ||
+                        selectedType.isNotBlank() ||
+                        selectedHabitat.isNotBlank() ||
+                        showFavoritesOnly
+
+                val resetColor by androidx.compose.animation.animateColorAsState(
+                    targetValue = if (hasActiveFilter)
+                        MaterialTheme.colorScheme.primary
+                    else
+                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f),
+                    animationSpec = androidx.compose.animation.core.tween(durationMillis = 300),
+                    label = "resetColor"
+                )
+
+                TextButton(
+                    onClick = { resetLocal() },
+                    enabled = hasActiveFilter
+                ) {
                     Text(
                         text = "Reset",
                         style = MaterialTheme.typography.labelLarge,
-                        color = MaterialTheme.colorScheme.primary
+                        color = resetColor
                     )
                 }
             }
