@@ -109,7 +109,9 @@ fun DexifyNavHost() {
                     }
                 }
             }
-        ) { _ ->
+        ) { innerPadding ->
+            @Suppress("UNUSED_VARIABLE")
+            val bottomBarPadding = innerPadding.calculateBottomPadding()
             NavHost(
                 navController = navController,
                 startDestination = "splash",
