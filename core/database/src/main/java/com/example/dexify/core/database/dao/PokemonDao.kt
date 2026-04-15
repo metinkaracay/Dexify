@@ -44,4 +44,7 @@ interface PokemonDao {
 
     @Query("SELECT * FROM pokemon WHERE isFavorite = 1 AND name LIKE '%' || :query || '%' ORDER BY id ASC")
     fun searchFavoritesByNamePagingSource(query: String): PagingSource<Int, PokemonEntity>
+
+    @Query("SELECT id FROM pokemon WHERE isFavorite = 1")
+    fun getFavoriteIdsFlow(): Flow<List<Int>>
 }
