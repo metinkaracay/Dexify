@@ -74,6 +74,9 @@ dependencies {
     // Paging (needed for PagingData types in navigation)
     implementation(libs.androidx.paging.compose)
 
+    // Coil
+    implementation(libs.coil.compose)
+
     // Testing
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
