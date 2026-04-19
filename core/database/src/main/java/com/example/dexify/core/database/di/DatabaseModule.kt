@@ -3,6 +3,7 @@ package com.example.dexify.core.database.di
 import android.content.Context
 import androidx.room.Room
 import com.example.dexify.core.database.PokemonDatabase
+import com.example.dexify.core.database.dao.InventoryDao
 import com.example.dexify.core.database.dao.PokemonDao
 import dagger.Module
 import dagger.Provides
@@ -34,4 +35,9 @@ object DatabaseModule {
         return database.pokemonDao()
     }
 
+    @Provides
+    @Singleton
+    fun provideInventoryDao(database: PokemonDatabase): InventoryDao {
+        return database.inventoryDao()
+    }
 }
