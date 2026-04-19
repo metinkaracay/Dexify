@@ -25,7 +25,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -53,6 +52,7 @@ import androidx.paging.compose.itemKey
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.material3.TopAppBar
 import com.example.dexify.core.designsystem.component.EmptyState
 import com.example.dexify.core.designsystem.R as DesignSystemR
 import kotlinx.coroutines.launch
@@ -140,7 +140,7 @@ fun PokedexScreen(
                             contentPadding = PaddingValues(
                                 start = 16.dp,
                                 end = 16.dp,
-                                bottom = 24.dp,
+                                bottom = 88.dp,
                                 top = 8.dp
                             ),
                             horizontalArrangement = Arrangement.spacedBy(12.dp),
@@ -245,7 +245,7 @@ private fun SearchBar(
 private fun PokedexTopBar(
     scrollBehavior: TopAppBarScrollBehavior
 ) {
-    LargeTopAppBar(
+    TopAppBar(
         title = {
             Text(
                 text = "Pokédex",

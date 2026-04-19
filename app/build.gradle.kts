@@ -48,6 +48,7 @@ dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":feature:pokedex"))
     implementation(project(":feature:inventory"))
+    implementation(project(":feature:splash"))
 
     // Core Android
     implementation(libs.androidx.core.ktx)
@@ -72,6 +73,9 @@ dependencies {
 
     // Paging (needed for PagingData types in navigation)
     implementation(libs.androidx.paging.compose)
+
+    // Coil
+    implementation(libs.coil.compose)
 
     // Testing
     testImplementation(libs.junit)

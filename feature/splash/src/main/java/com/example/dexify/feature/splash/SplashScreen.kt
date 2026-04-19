@@ -1,4 +1,4 @@
-package com.example.dexify.feature.pokedex.splash
+package com.example.dexify.feature.splash
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -24,7 +24,6 @@ import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.LottieConstants
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
 import com.airbnb.lottie.compose.rememberLottieComposition
-import com.example.dexify.feature.pokedex.R
 
 @Composable
 fun SplashScreen(

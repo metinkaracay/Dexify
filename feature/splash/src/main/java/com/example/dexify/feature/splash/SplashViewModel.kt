@@ -1,4 +1,4 @@
-package com.example.dexify.feature.pokedex.splash
+package com.example.dexify.feature.splash
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

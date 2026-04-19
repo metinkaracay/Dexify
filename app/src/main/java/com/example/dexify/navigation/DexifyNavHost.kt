@@ -1,7 +1,10 @@
 package com.example.dexify.navigation
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Backpack
@@ -17,7 +20,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -32,7 +43,7 @@ import androidx.navigation.navArgument
 import com.example.dexify.feature.inventory.InventoryScreen
 import com.example.dexify.feature.pokedex.detail.PokemonDetailScreen
 import com.example.dexify.feature.pokedex.pokelist.PokedexScreen
-import com.example.dexify.feature.pokedex.splash.SplashScreen
+import com.example.dexify.feature.splash.SplashScreen
 
 // ─── Bottom Nav Items ──────────────────────────────────────
 private data class BottomNavItem(
@@ -60,10 +71,30 @@ fun DexifyNavHost() {
 
     val showBottomBar = currentRoute !in noBottomBarRoutes && currentRoute != null && currentRoute != "splash"
 
+    var isBottomBarVisible by rememberSaveable { mutableStateOf(true) }
+
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                if (available.y < -10f) {
+                    isBottomBarVisible = false
+                } else if (available.y > 10f) {
+                    isBottomBarVisible = true
+                }
+                return Offset.Zero
+            }
+        }
+    }
+
     SharedTransitionLayout {
         Scaffold(
+            modifier = Modifier.nestedScroll(nestedScrollConnection),
             bottomBar = {
-                if (showBottomBar) {
+                AnimatedVisibility(
+                    visible = showBottomBar && isBottomBarVisible,
+                    enter = slideInVertically { it },
+                    exit = slideOutVertically { it }
+                ) {
                     NavigationBar(
                         containerColor = MaterialTheme.colorScheme.surface,
                         tonalElevation = 2.dp
