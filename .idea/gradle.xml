@@ -18,6 +18,7 @@
             <option value="$PROJECT_DIR$/feature" />
             <option value="$PROJECT_DIR$/feature/inventory" />
             <option value="$PROJECT_DIR$/feature/pokedex" />
+            <option value="$PROJECT_DIR$/feature/splash" />
           </set>
         </option>
       </GradleProjectSettings>

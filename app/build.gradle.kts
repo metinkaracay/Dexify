@@ -48,6 +48,7 @@ dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":feature:pokedex"))
     implementation(project(":feature:inventory"))
+    implementation(project(":feature:splash"))
 
     // Core Android
     implementation(libs.androidx.core.ktx)

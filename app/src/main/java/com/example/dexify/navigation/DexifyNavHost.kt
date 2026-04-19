@@ -32,7 +32,7 @@ import androidx.navigation.navArgument
 import com.example.dexify.feature.inventory.InventoryScreen
 import com.example.dexify.feature.pokedex.detail.PokemonDetailScreen
 import com.example.dexify.feature.pokedex.pokelist.PokedexScreen
-import com.example.dexify.feature.pokedex.splash.SplashScreen
+import com.example.dexify.feature.splash.SplashScreen
 
 // ─── Bottom Nav Items ──────────────────────────────────────
 private data class BottomNavItem(
