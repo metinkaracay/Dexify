@@ -22,7 +22,7 @@ class DexifyApplication : Application(), ImageLoaderFactory {
                     .maxSizePercent(0.05)
                     .build()
             }
-            .respectCacheHeaders(false) // CRITICAL: Ignora network cache headers to force disk cache when offline
+            .respectCacheHeaders(false)
             .build()
     }
 }
