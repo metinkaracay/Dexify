@@ -231,13 +231,6 @@ fun InventoryScreen(
                     }
 
                     is LoadState.NotLoading -> {
-                        val allItems = pagingItems.itemSnapshotList.items
-                        val filteredItems = if (searchQuery.isBlank()) {
-                            allItems
-                        } else {
-                            allItems.filter { it.name.contains(searchQuery, ignoreCase = true) }
-                        }
-
                         LazyColumn(
                             modifier = Modifier.fillMaxSize(),
                             contentPadding = PaddingValues(
@@ -249,28 +242,33 @@ fun InventoryScreen(
                             verticalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
                             items(
-                                count = filteredItems.size,
-                                key = { index -> "${filteredItems[index].category.name}_${filteredItems[index].id}" }
+                                count = pagingItems.itemCount,
+                                key = { index -> 
+                                    val item = pagingItems.peek(index)
+                                    item?.let { "${it.category.name}_${it.id}" } ?: index
+                                }
                             ) { index ->
-                                val item = filteredItems[index]
-                                val isVisible = selectedItem != item
+                                val item = pagingItems[index]
+                                if (item != null) {
+                                    val isVisible = selectedItem != item
 
-                                AnimatedVisibility(
-                                    visible = isVisible,
-                                    enter = fadeIn() + scaleIn(initialScale = 0.92f),
-                                    exit = fadeOut() + scaleOut(targetScale = 0.92f)
-                                ) {
-                                    InventoryItemCard(
-                                        item = item,
-                                        onClick = { selectedItem = item },
-                                        modifier = Modifier
-                                            .sharedBounds(
-                                                sharedContentState = rememberSharedContentState(
-                                                    key = "card_${item.category.name}_${item.id}"
-                                                ),
-                                                animatedVisibilityScope = this@AnimatedVisibility
-                                            )
-                                    )
+                                    AnimatedVisibility(
+                                        visible = isVisible,
+                                        enter = fadeIn() + scaleIn(initialScale = 0.92f),
+                                        exit = fadeOut() + scaleOut(targetScale = 0.92f)
+                                    ) {
+                                        InventoryItemCard(
+                                            item = item,
+                                            onClick = { selectedItem = item },
+                                            modifier = Modifier
+                                                .sharedBounds(
+                                                    sharedContentState = rememberSharedContentState(
+                                                        key = "card_${item.category.name}_${item.id}"
+                                                    ),
+                                                    animatedVisibilityScope = this@AnimatedVisibility
+                                                )
+                                        )
+                                    }
                                 }
                             }
 
@@ -458,8 +456,6 @@ private fun InventoryItemDetailOverlay(
                 .verticalScroll(rememberScrollState())
                 .padding(24.dp)
         ) {
-
-            // Image (if not berry)
             if (item.category != InventoryCategory.BERRIES && item.imageUrl != null) {
                 Box(
                     modifier = Modifier
@@ -479,7 +475,6 @@ private fun InventoryItemDetailOverlay(
                 Spacer(modifier = Modifier.height(12.dp))
             }
 
-            // Name
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -491,7 +486,6 @@ private fun InventoryItemDetailOverlay(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-
                 Text(
                     text = "ID: #${item.id}",
                     style = MaterialTheme.typography.labelMedium,
@@ -503,7 +497,6 @@ private fun InventoryItemDetailOverlay(
             HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
             Spacer(modifier = Modifier.height(8.dp))
 
-            // Description
             Text(
                 text = "Description",
                 style = MaterialTheme.typography.titleSmall,
